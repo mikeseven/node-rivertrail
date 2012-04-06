@@ -48,7 +48,10 @@
  * Lexical scanner.
  */
 
-Narcissus.lexer = (function() {
+if(typeof Narcissus === 'undefined') {
+  var Narcissus=require(__dirname+'/jsdefs');
+}
+module.exports=/*Narcissus.lexer =*/ (function() {
 
     var definitions = Narcissus.definitions;
 

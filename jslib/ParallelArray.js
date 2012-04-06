@@ -2043,3 +2043,10 @@ low_precision.wrapper = function (f) {
 low_precision.wrapper.prototype = {
     "unwrap" : function () { return this.wrappedFun; }
 };
+
+if(typeof window === 'undefined') {
+  module.exports={
+    ParallelArray : ParallelArray,
+    low_precision : low_precision
+  };
+}

@@ -35,7 +35,11 @@
 // returns only the external needed outside of the function.
 
 if (RiverTrail === undefined) {
-    var RiverTrail = {};
+  var RiverTrail = (typeof window === 'undefined') ? global.RiverTrail : {};
+}
+
+if (DPOInterface === undefined && (typeof window === 'undefined')) {
+  var DPOInterface = global.DPOInterface;
 }
 
 RiverTrail.compiler = (function () {
@@ -49,7 +53,7 @@ RiverTrail.compiler = (function () {
     // whether to cache OpenCL buffers
     var useBufferCaching = true;
 
-    const suppressOpenCL = false;
+    var/*const*/ suppressOpenCL = false;
 
     var openCLContext; 
     var dpoInterface; 
@@ -89,7 +93,7 @@ RiverTrail.compiler = (function () {
         } else {
             lowPrecision = !enable64BitFloatingPoint;
         }
-        const defaultNumberType = lowPrecision ? "float": "double";
+        var/*const*/ defaultNumberType = lowPrecision ? "float": "double";
 
         // First convert all array arguments into suitable flat representations that can be passed to
         // the OpenCL side
@@ -97,12 +101,7 @@ RiverTrail.compiler = (function () {
         args = Array.prototype.map.call(args, 
                                      function (object) {
                                          if (object instanceof Array) {
-                                             if ((typeof(openCLContext.canBeMapped) === 'function') && (openCLContext.canBeMapped(object))) {
-                                                 // we have found a JavaScript array that can be directly mapped, so we keep it
-                                                 return object;
-                                             } else {
-                                                 return new RiverTrail.Helper.FlatArray( lowPrecision ? Float32Array : Float64Array, object);
-                                             }
+                                             return new RiverTrail.Helper.FlatArray( lowPrecision ? Float32Array : Float64Array, object);
                                          } else {
                                              return object;
                                          }});
@@ -240,13 +239,11 @@ RiverTrail.compiler = (function () {
             } else if (argument instanceof RiverTrail.Helper.FlatArray) {
                 argumentTypes.push({ inferredType: defaultNumberType, dimSize: argument.shape});
             } else if (argument instanceof Array) {
-                // SAH: if an array makes it here without being transformed into a flat array, it
-                //      must be a dense, homogeneous JavaScript array. Those are always double arrays
-                //      and we assume the shape can be derived by looking at the first element in
-                //      each dimension.
-                // NOTE: I use /* jsval */ double as type to make sure these are not confused with 
-                //       ordinary arrays when checking for matching signatures.
-                argumentTypes.push({ inferredType: "/* jsval */ double", dimSize: function makeShape(a, r) { if (a instanceof Array) { r.push(a.length); makeShape(a[0], r); } return r;}(argument, []) });
+                // SAH: treating all non-PA arrays as float requires a check for regularity and 
+                //      homogeneity! This is done in the transfer code. Also note that the below
+                //      is only true for flat arrays. All other arrays have to be transformed into
+                //      flat arrays first.
+                argumentTypes.push({ inferredType: defaultNumberType, dimSize: [argument.length] });
             } else if (RiverTrail.Helper.isTypedArray(argument)) {
                 argumentTypes.push({ inferredType: RiverTrail.Helper.inferTypedArrayType(argument), dimSize: [argument.length] });
             } else if (argument instanceof RiverTrail.Helper.Integer) {

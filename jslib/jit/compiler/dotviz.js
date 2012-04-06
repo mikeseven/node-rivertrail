@@ -25,6 +25,10 @@
  *
  */
 
+if (RiverTrail === undefined) {
+  var RiverTrail = (typeof window === 'undefined') ? global.RiverTrail : {};
+}
+
 //
 // Graphviz dot visualizer for Narzissus tree
 //

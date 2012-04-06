@@ -25,6 +25,10 @@
  *
  */
 
+if (RiverTrail === undefined) {
+  var RiverTrail = (typeof window === 'undefined') ? global.RiverTrail : {};
+}
+
 RiverTrail.RangeAnalysis = function () {
     var definitions = Narcissus.definitions;
     eval(definitions.consts);
@@ -518,10 +522,9 @@ RiverTrail.RangeAnalysis = function () {
                 // return does not really produce a value as it exists the current scope. However,
                 // it is a non int ast, as we always return floats. This is modelled this way...
                 result = new Range(undefined, undefined, false);
-                // also, if the rhs is an identifier with non-scalar type, we promote its type to double to avoid casting on return
-                if ((ast.value.type === IDENTIFIER) && (!ast.value.typeInfo.isScalarType())) {
+                // also, if the rhs is an identifier, we promote its type to double to avoid casting on return
+                if (ast.value.type === IDENTIFIER) {
                     varEnv.lookup(ast.value.value).forceInt(false);
-                    ast.value.rangeInfo = varEnv.lookup(ast.value.value);
                 }
 
                 break;
@@ -801,7 +804,9 @@ RiverTrail.RangeAnalysis = function () {
                 // we support array.length and PA.length as it is somewhat a common loop bound. Could be more elaborate
                 drive(ast.children[0], varEnv, doAnnotate);
                 //drive(ast.children[1], varEnv, doAnnotate); // this needs to be an identifier, so no need to range infer it
-                if ((ast.children[1].value === "length") && ast.children[0].typeInfo.isArrayishType()) {
+                if ((ast.children[1].value === "length") &&
+                    ((ast.children[0].typeInfo.isObjectType("Array") ||
+                      ast.children[0].typeInfo.isObjectType("ParallelArray")))) {
                     result = new Range(ast.children[0].typeInfo.properties.shape[0], ast.children[0].typeInfo.properties.shape[0], true);
                 } else {
                     result = new Range(undefined, undefined, false);
@@ -1023,11 +1028,11 @@ RiverTrail.RangeAnalysis = function () {
             debug && console.log("updating " + type.toString() + " to " + target);
             if (type.isNumberType()) {
                 type.OpenCLType = target;
-            } else if (type.isArrayishType()) {
+            } else if (type.isObjectType("Array") || type.isObjectType("ParallelArray")) {
                 updateToNew(type.properties.elements, target);
                 type.updateOpenCLType();
             } else if (type.isBoolType()) {
-                // do nothing. bool and int work nicely together.
+                //ï¿½do nothing. bool and int work nicely together.
             } else {
                 reportBug("update to new called on unsupported type");
             }

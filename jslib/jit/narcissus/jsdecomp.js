@@ -41,6 +41,11 @@
  * Decompiler and pretty-printer.
  */
 
+if(typeof Narcissus === 'undefined') {
+  var Narcissus=require(__dirname+'/jsdefs');
+  Narcissus.parser=require(__dirname+'/jsparse');
+}
+
 Narcissus.decompiler = (function() {
 
     const parser = Narcissus.parser;
@@ -523,3 +528,6 @@ Narcissus.decompiler = (function() {
     };
 
 }());
+
+if(typeof window === 'undefined')
+  module.exports=Narcissus.decompiler;

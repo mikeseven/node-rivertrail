@@ -49,6 +49,11 @@
  * Parser.
  */
 
+if(typeof Narcissus === 'undefined') {
+  var Narcissus=require(__dirname+'/jsdefs');
+  Narcissus.lexer=require(__dirname+'/jslex');
+}
+
 Narcissus.parser = (function() {
 
     var lexer = Narcissus.lexer;
@@ -1438,3 +1443,6 @@ Narcissus.parser = (function() {
     };
 
 }());
+
+if(typeof window === 'undefined')
+  module.exports=Narcissus.parser;

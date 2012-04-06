@@ -50,7 +50,7 @@
  * done by SpiderMonkey.
  */
 
-(function() {
+Narcissus=(function() {
 
     var narcissus = {
         options: {
@@ -59,7 +59,12 @@
         hostGlobal: this
     };
     Narcissus = narcissus;
+  return narcissus;
 })();
+
+if(typeof window === 'undefined') {
+  module.exports=Narcissus;
+}
 
 Narcissus.definitions = (function() {
 

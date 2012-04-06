@@ -26,7 +26,7 @@
  */
 
 if (RiverTrail === undefined) {
-    var RiverTrail = {};
+    var RiverTrail = (typeof window === 'undefined') ? global.RiverTrail : {};
 }
 
 RiverTrail.definitions = function () {
@@ -47,5 +47,3 @@ RiverTrail.definitions = function () {
 
     return {"consts" : consts, "tokens" : tokens};
 }();
-
-

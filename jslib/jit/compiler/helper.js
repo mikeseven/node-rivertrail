@@ -26,7 +26,7 @@
  */
 
 if (RiverTrail === undefined) {
-    var RiverTrail = {};
+  var RiverTrail = (typeof window === 'undefined') ? global.RiverTrail : {};
 }
 
 RiverTrail.Helper = function () {
