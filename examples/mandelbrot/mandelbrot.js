@@ -95,10 +95,10 @@ function computeColorMap() {
 // n is the number of iterations and color at c(x,y)
 // test for divergence: radius>=2 or max iterations (512) reached
 function computeSet(iv, scale, limit, nmax, width, height) {
-  var y = iv[1];
-  var x = iv[0];
-
-  var x2 = x-width*0.5, y2 = y-height*0.5;  // center image
+  var x = iv[1];
+  var y = iv[0];
+  var w2 = width>>1, h2 = height>>1;
+  var x2 = x-w2, y2 = y-h2;  // center image
   var Cr = x2 / scale + 0.407476;
   var Ci = y2 / scale + 0.234204;
   var I = 0, R = 0, I2 = 0, R2 = 0;
@@ -109,8 +109,7 @@ function computeSet(iv, scale, limit, nmax, width, height) {
     R = R2 - I2 + Cr;       // real part
     R2 = R * R;
     I2 = I * I;
-    //n++;  // [mbs] this produces ((int)n)++; 'error: assignment to cast is illegal, lvalue casts are not supported'
-    n=n+1;
+    n++;
   }
   return n; // number of iterations at (x,y)
 }
